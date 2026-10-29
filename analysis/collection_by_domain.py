@@ -448,7 +448,8 @@ def write_md(J):
          f"- collection AUC at m = 10 = {S['collection_auc_m10_ratio_oracle_NAT1']:.3f} "
          f"{fmt_ci(S['collection_auc_m10_ci95'])} (paper 0.949; the difference is Monte Carlo error of the "
          "40,000/m draws).",
-         f"- standardized ratio: d_z = {S['z_oracle_dz_NAT1']:.3f} (paper 1.04), n80 = {S['z_oracle_n80_NAT1']} (paper 6).",
+         f"- standardized ratio: d_z = {S['z_oracle_dz_NAT1']:.3f} (paper 1.04), n80 = {S['z_oracle_n80_NAT1']} by the normal "
+         f"approximation and {S['z_oracle_n80_empirical_NAT1']} by resampling (paper 7, resampled).",
          f"- the collection-AUC routine reproduces `paper_figures.collection_auc` draw for draw "
          f"(max |diff| = {S['replication_of_pf_collection_auc_max_abs_diff']:.1e} at a common Generator state).",
          "",

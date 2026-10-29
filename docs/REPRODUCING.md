@@ -455,7 +455,8 @@ python figures/compare_with_paper.py --generated "$OLMO_TWIN_DATA/paper" --paper
 
 `make_all.sh` runs `paper_figures.py`, which writes the tables, the macros
 and `analysis/paper_numbers.json`. It then runs `published_figures.py`,
-which redraws the data figures exactly as published, and
+which redraws the other data figures exactly as published (`attacks_auc.pdf`
+is the version of `paper_figures.py`), and
 `paper_design_figure.py`. [paper_outputs.md](paper_outputs.md) explains
 why there are two generators and lists the parts of the paper that were
 edited by hand.

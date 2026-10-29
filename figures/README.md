@@ -27,8 +27,8 @@ revisions of the same generator, so no single revision reproduces both:
   statistics, and `collection_by_domain.py` and `exclusion_sensitivity.py`
   check their results against the `analysis/paper_numbers.json` it writes.
   It writes the tables, the macros and `paper_numbers.json`. It also draws
-  its own versions of the data figures; two of them (`cohort.pdf`,
-  `signal_distributions.pdf`) equal the published ones.
+  its own versions of the data figures; three of them (`attacks_auc.pdf`,
+  `cohort.pdf`, `signal_distributions.pdf`) equal the published ones.
 * `published_figures.py` is the earlier revision (12 October 2026) that drew
   the published data figures, together with the figure-only corrections made
   before publication and the one-column cohort figure of the current revision.
@@ -61,8 +61,8 @@ figures/make_all.sh                   # or: figures/make_all.sh --out DIR
 1. `python figures/paper_figures.py --out DIR` writes `DIR/tables/` and
    `analysis/paper_numbers.json`, and draws its versions of the data figures
    into `DIR/figures/`;
-2. `python figures/published_figures.py --out DIR` overwrites the 11 data
-   figures in `DIR/figures/` with the published versions;
+2. `python figures/published_figures.py --out DIR` overwrites the other 10
+   data figures in `DIR/figures/` with the published versions;
 3. `python figures/paper_design_figure.py --out DIR/figures` writes
    `DIR/figures/design.pdf`. For this script `--out` names the directory that
    receives the PDF, not its parent.
@@ -96,7 +96,8 @@ writes `paper_numbers.json` with the same headline entries (`NAT1`, `ALL`, `E`,
 
 ## Agreement with the paper
 
-Measured on 28 October 2026 with Python 3.13.12, numpy 2.5.1 and
+Measured on 28 October 2026, and again on 29 October 2026 after the change to
+Figure 5, with Python 3.13.12, numpy 2.5.1 and
 matplotlib 3.10.8. Figures were compared with `compare_with_paper.py`
 (rendered at 150 dpi with pypdfium2, exact pixel equality); macros after
 normalizing `\num{}`, `\xspace` and thousands separators.
@@ -105,8 +106,8 @@ normalizing `\num{}`, `\xspace` and thousands separators.
   `paper_design_figure.py`): all 12 PDFs (the 11 data figures and
   `design.pdf`) are pixel-identical to the published ones.
 * `paper_figures.py`: `analysis/paper_numbers.json` is byte-identical to the
-  file the analysis steps used. Of its figures, `cohort.pdf` and
-  `signal_distributions.pdf` are identical to the published ones; the others
+  file the analysis steps used. Of its figures, `attacks_auc.pdf`, `cohort.pdf`
+  and `signal_distributions.pdf` are identical to the published ones; the others
   differ in 0.3 to 29% of pixels, and `dose.pdf` has another width.
 * `numbers.tex`: the generator emits 868 of the paper's 894 macros, 765 of
   them with the published value. The 103 that differ are 64 `calib*` macros

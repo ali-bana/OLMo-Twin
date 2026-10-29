@@ -50,7 +50,7 @@ you want to keep the released files.
 | `cohortF_audit` | `audit_cohortF_data.py` | bundle manifest and texts, `cohortF_reparse/`, scores | `analysis/cohortF_data_exclusions.json` |
 | `cohortF_check` | `cohortF_2x2_check.py` | attack table, `run/scores_cohortF_2x2/`, `run/cohortF_2x2/tokens/`, bundle tokens of cohort F, `bundle/logprobs_extra_stage1/scores.csv.gz` | `analysis/cohortF_2x2_check.json` |
 | `full_pass` | `figures/paper_figures.py --out paper` | all outputs above | `paper/tables/`, `paper/figures/`, `analysis/paper_numbers.json` (overwritten) |
-| `published_figures` | `figures/published_figures.py`, `figures/paper_design_figure.py` | as the full pass | the data figures as published and `design.pdf` in `paper/figures/` |
+| `published_figures` | `figures/published_figures.py`, `figures/paper_design_figure.py` | as the full pass | the other data figures as published (all but `attacks_auc.pdf`, which the full pass draws) and `design.pdf` in `paper/figures/` |
 | `table4` | `recompute_table4_all_pairs.py`, then `format_table4.py` | calibrated outputs, `paper/tables/numbers.tex` | `analysis/table4_all_pairs/` (values, macros, `calibrated_allNAT1_textCIs.tex`) |
 | `rlvr` | `rlvr/recompute.py`, `rlvr/rl_minus_dpo.py`, `rlvr/finalize.py` | attack table, `run/scores_posttrain/`, `rlvr/overlap/rlvr_overlap_per_doc.csv.gz` | `rlvr/work/` (intermediate), `rlvr/` (final tables and `proposed_macros.tex`) |
 

@@ -201,24 +201,27 @@ def n80(dz):
     return int(math.ceil(((Z95 + Z80) / dz) ** 2))
 
 
-def n80_resampled(d, draws=20000, seed=20261012):
+def n80_resampled(d, draws=20000, seed=20261012, nmax=2000):
     """Smallest n at which a one-sided paired t-test at alpha 0.05 rejects in at
     least 80% of `draws` resamples of n pairs (with replacement) from the
-    observed contrasts d. Used for the standardized ratio, whose d_z is large
-    enough that n is small and the normal approximation n80() is too optimistic
-    (it ignores the heavier tails of the t distribution). Uses its own
-    generator, so the shared stream RNG is not consumed."""
+    observed contrasts d; None if no n <= nmax does (e.g. mean(d) <= 0). Used
+    for the standardized ratio. The result can differ from the normal
+    approximation n80() in either direction, because it uses the t test at
+    the actual n and the observed (skewed) distribution of the contrasts; for
+    the exact counterfactual n80() gives 6 but resampling needs 7. Uses its
+    own generator, so the shared stream RNG is not consumed."""
     from scipy import stats as _st
     d = np.asarray(d, float); d = d[np.isfinite(d)]
+    if not d.size or d.mean() <= 0:
+        return None
     rng = np.random.default_rng(seed)
-    n = 2
-    while True:
+    for n in range(2, nmax + 1):
         x = d[rng.integers(0, d.size, (draws, n))]
         with np.errstate(divide="ignore", invalid="ignore"):  # a draw of n identical pairs has SD 0
             t = x.mean(axis=1) / (x.std(axis=1, ddof=1) / math.sqrt(n))
         if (t > _st.t.ppf(0.95, n - 1)).mean() >= 0.80:
             return n
-        n += 1
+    return None
 
 
 # ------------------------------------------------------------------- load
