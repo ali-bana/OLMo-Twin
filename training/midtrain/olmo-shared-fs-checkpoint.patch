@@ -1,0 +1,92 @@
+diff --git a/olmo/checkpoint.py b/olmo/checkpoint.py
+index 9453a69c..321ac789 100644
+--- a/olmo/checkpoint.py
++++ b/olmo/checkpoint.py
+@@ -3,6 +3,7 @@ import io
+ import logging
+ import pickle
+ import shutil
++import time
+ import traceback
+ from abc import ABCMeta, abstractmethod
+ from collections import defaultdict
+@@ -568,11 +569,13 @@ class Checkpointer(metaclass=ABCMeta):
+             shutil.rmtree(checkpoint_dir_tmp, ignore_errors=True)
+             checkpoint_dir_tmp.mkdir(exist_ok=True, parents=True)
+ 
+-        # In the cases where we're using a shared NFS drive between ranks to save checkpoints,
+-        # creating the temp directory from rank 0 might not be immediately
+-        # realized in the file systems of the other ranks.
+-        # So we wait here across all ranks until that tmp checkpoint directory is visible.
+-        wait_for(lambda: checkpoint_dir_tmp.exists(), "Waiting for checkpoint directory", timeout=10.0)
++        # OLMo-Twin patch (shared file system): polling exists() for a directory made
++        # on another node can starve on cached negative lookups long past any
++        # timeout (observed > 300 s on a shared NFS mount). mkdir always round-trips to the
++        # server, so after rank 0 has (re)created the tmp directory every rank
++        # simply mkdirs it with exist_ok instead of waiting to see it.
++        barrier()
++        checkpoint_dir_tmp.mkdir(exist_ok=True, parents=True)
+ 
+         barrier()
+ 
+@@ -594,11 +597,21 @@ class Checkpointer(metaclass=ABCMeta):
+                 if not checkpoint_dir.exists():
+                     raise
+ 
+-        # In the cases where we're using a shared NFS drive between ranks to save checkpoints,
+-        # replacing the temp directory with the final directory from rank 0 might not be immediately
+-        # realized in the file systems of the other ranks.
+-        # So we wait here across all ranks until that final checkpoint directory is visible.
+-        wait_for(lambda: checkpoint_dir.exists(), "Waiting for checkpoint directory", timeout=10.0)
++        # OLMo-Twin patch (shared file system): rank 0 just renamed tmp -> final, but a
++        # plain exists() poll on other nodes can be starved by negative-lookup
++        # caching. A probe mkdir/rmdir in the parent bumps its mtime on the
++        # server, invalidating the stale negative dentry, so exists() converges.
++        _deadline = time.monotonic() + 1800.0
++        _probe = checkpoint_dir.parent / f".waitprobe-{get_global_rank()}"
++        while not checkpoint_dir.exists():
++            if time.monotonic() > _deadline:
++                raise TimeoutError("Waiting for checkpoint directory timed out")
++            try:
++                _probe.mkdir(exist_ok=True)
++                _probe.rmdir()
++            except OSError:
++                pass
++            time.sleep(2.0)
+ 
+         barrier()
+ 
+@@ -1922,24 +1935,17 @@ class OlmoCoreCheckpointer(Checkpointer):
+ 
+         with self._temporary_wd(dir) as checkpoint_dir:
+             log.info("Saving model and optim state...")
+-            if get_fs_local_rank() == 0:
+-                (checkpoint_dir / "model").mkdir(exist_ok=True, parents=True)
+-                (checkpoint_dir / "optim").mkdir(exist_ok=True, parents=True)
+-                (checkpoint_dir / "train").mkdir(exist_ok=True, parents=True)
++            # OLMo-Twin patch (shared file system): create on every rank instead of
++            # polling for rank 0's mkdir to become visible (mkdir is a server
++            # round-trip and cannot be starved by negative-lookup caching;
++            # concurrent mkdir of one path is resolved server-side, EEXIST is
++            # swallowed by exist_ok). This wait timed out at > 300 s
++            # despite a raised wait_for timeout.
++            (checkpoint_dir / "model").mkdir(exist_ok=True, parents=True)
++            (checkpoint_dir / "optim").mkdir(exist_ok=True, parents=True)
++            (checkpoint_dir / "train").mkdir(exist_ok=True, parents=True)
+             barrier()
+ 
+-            wait_for(
+-                lambda: (checkpoint_dir / "model").exists(), "Waiting for checkpoint model directory", timeout=10.0
+-            )
+-
+-            wait_for(
+-                lambda: (checkpoint_dir / "optim").exists(), "Waiting for checkpoint optim directory", timeout=10.0
+-            )
+-
+-            wait_for(
+-                lambda: (checkpoint_dir / "train").exists(), "Waiting for checkpoint train directory", timeout=10.0
+-            )
+-
+             local_files_created = save_model_and_optim_state(
+                 checkpoint_dir, dist_model, optim, save_overwrite=self.cfg.save_overwrite
+             )

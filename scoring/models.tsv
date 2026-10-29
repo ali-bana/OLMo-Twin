@@ -1,0 +1,185 @@
+# Models scored in the paper: one row per label. Read by scoring/run_scoring.sh.
+#
+# Columns (tab-separated; "-" = empty):
+#   label          revision label written into scores.csv.gz; also the name of the output directory
+#   scorer         olmo     = score_injection_v2.py (OLMo-native checkpoint: model.pt + config.yaml)
+#                  olmo_ext = score_injection_v2_extended.py (same, plus mu/sigma over the vocabulary)
+#                  hf       = score_injection_v2_hf.py (Hugging Face model directory)
+#   model          checkpoint or model directory, relative to the data root ($OLMO_TWIN_DATA);
+#                  a shell glob is allowed and must match exactly one directory
+#   out_dir        output directory, relative to the data root
+#   bundle         directory the evaluation manifest's tokens_relpath are relative to, relative to the
+#                  data root; "-" = bundle/. The evaluation manifest is <bundle>/evaluation_manifest.csv.gz.
+#   expected_seed  value of `seed:` that the checkpoint's config.yaml must declare ("-" = not checked).
+#                  The seed-42 checkpoints (AI2's "ingredient3", and our treated run, which declares seed
+#                  42 as well) are the control; the seed-42069 checkpoints ("ingredient1") are the
+#                  independent reference and must never be scored as the control.
+#   extra_flags    further arguments for the scorer, passed to both the scoring and the merge pass
+#
+# Sources of the rows: the scoring_meta.rank*.json files written by the scorers in each output directory.
+#
+# The post-training run directories are named by open-instruct: <exp_name>__<seed>__<suffix>. SFT and DPO
+# runs end in __0; the RLVR runs end in their launch time (a Unix timestamp), hence the globs. The pattern
+# [0-9]*[0-9] matches the final model directory but not its sibling <run>_checkpoints/, which holds the
+# intermediate checkpoints step_200 ... step_2600.
+#
+# The cohort-F rows score the 556 re-parsed cohort-F documents (run/cohortF_2x2/, written by
+# scoring/cohortF_2x2_tokenise.py); their token paths are relative to run/cohortF_2x2, hence the bundle column.
+#
+# AI2's released post-trained models (assets/hf_models/ai2_released/) were downloaded from the Hugging Face
+# Hub on 27 Oct 2026 without recording the revision. SHA-256 of the weight file of each local copy:
+#   OLMo-2-0425-1B-SFT/pytorch_model.bin        338aeb8b3049cc9b19ba1f3e6df4b5280f3e002b5ae9e38328a353d8f072d534
+#   OLMo-2-0425-1B-DPO/pytorch_model.bin        2262a62b6caa094aeea3996b054a080370d59f349436d5e9788792063d6acda1
+#   OLMo-2-0425-1B-RLVR1/model.safetensors      c556b74da82a3f3d72a4a07515c1703ae87c06eeefb1c726628090535ac1e2ad
+#   OLMo-2-0425-1B-Instruct/model.safetensors   36d044c73655bb904f822915e6294ba3dae8e6e1af5e703e9d452f2d6a3a294f
+# On the same day the Hub API reported `main` of allenai/OLMo-2-0425-1B-{SFT,DPO,RLVR1,Instruct} at commits
+#   SFT       0d85a3d037876ce6ac7d4311d994400fc66ac27f
+#   DPO       c4b0485961ab24c2433b090f3b922f0913a9290f
+#   RLVR1     12cb33498d26b411c38ac3ca9df27180a1d291b8
+#   Instruct  48d788eca847d4d7548f375ad03d3c9312f6139e
+# (all last modified 2025-04-30). The RLVR1 and Instruct hashes above equal the LFS object ids that the Hub
+# listed for model.safetensors on `main` that day; the LFS ids of the SFT and DPO pytorch_model.bin were not
+# queried.
+label	scorer	model	out_dir	bundle	expected_seed	extra_flags
+injected-step23852	olmo	run/checkpoints/step23852-unsharded	run/scores/injected-step23852	-	42	-
+official-seed42-step23852	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step23852-unsharded	run/scores/official-seed42-step23852	-	42	-
+sibling-seed42069-step23852	olmo_ext	assets/checkpoints/official_stage2_ingredient1/step23852-unsharded	run/scores/sibling-seed42069-step23852	-	42069	-
+ext-injected	olmo_ext	run/checkpoints/step23852-unsharded	run/scores_ext/ext-injected	-	42	-
+ext-seed42	olmo_ext	assets/checkpoints/official_stage2_ingredient3_seed42/step23852-unsharded	run/scores_ext/ext-seed42	-	42	-
+ext-stage1-pretreatment	olmo_ext	assets/checkpoints/official_olmo_stage1_4001B	run/scores_ext/ext-stage1-pretreatment	-	-	-
+injected-step1000	olmo	run/checkpoints/step1000-unsharded	run/scores_ladder/injected-step1000	-	42	--no-token-dump
+injected-step2000	olmo	run/checkpoints/step2000-unsharded	run/scores_ladder/injected-step2000	-	42	--no-token-dump
+injected-step3000	olmo	run/checkpoints/step3000-unsharded	run/scores_ladder/injected-step3000	-	42	--no-token-dump
+injected-step4000	olmo	run/checkpoints/step4000-unsharded	run/scores_ladder/injected-step4000	-	42	--no-token-dump
+injected-step5000	olmo	run/checkpoints/step5000-unsharded	run/scores_ladder/injected-step5000	-	42	--no-token-dump
+injected-step6000	olmo	run/checkpoints/step6000-unsharded	run/scores_ladder/injected-step6000	-	42	--no-token-dump
+injected-step7000	olmo	run/checkpoints/step7000-unsharded	run/scores_ladder/injected-step7000	-	42	--no-token-dump
+injected-step8000	olmo	run/checkpoints/step8000-unsharded	run/scores_ladder/injected-step8000	-	42	--no-token-dump
+injected-step9000	olmo	run/checkpoints/step9000-unsharded	run/scores_ladder/injected-step9000	-	42	--no-token-dump
+injected-step10000	olmo	run/checkpoints/step10000-unsharded	run/scores_ladder/injected-step10000	-	42	--no-token-dump
+injected-step11000	olmo	run/checkpoints/step11000-unsharded	run/scores_ladder/injected-step11000	-	42	--no-token-dump
+injected-step12000	olmo	run/checkpoints/step12000-unsharded	run/scores_ladder/injected-step12000	-	42	--no-token-dump
+injected-step13000	olmo	run/checkpoints/step13000-unsharded	run/scores_ladder/injected-step13000	-	42	--no-token-dump
+injected-step14000	olmo	run/checkpoints/step14000-unsharded	run/scores_ladder/injected-step14000	-	42	--no-token-dump
+injected-step15000	olmo	run/checkpoints/step15000-unsharded	run/scores_ladder/injected-step15000	-	42	--no-token-dump
+injected-step16000	olmo	run/checkpoints/step16000-unsharded	run/scores_ladder/injected-step16000	-	42	--no-token-dump
+injected-step17000	olmo	run/checkpoints/step17000-unsharded	run/scores_ladder/injected-step17000	-	42	--no-token-dump
+injected-step18000	olmo	run/checkpoints/step18000-unsharded	run/scores_ladder/injected-step18000	-	42	--no-token-dump
+injected-step19000	olmo	run/checkpoints/step19000-unsharded	run/scores_ladder/injected-step19000	-	42	--no-token-dump
+injected-step20000	olmo	run/checkpoints/step20000-unsharded	run/scores_ladder/injected-step20000	-	42	--no-token-dump
+injected-step21000	olmo	run/checkpoints/step21000-unsharded	run/scores_ladder/injected-step21000	-	42	--no-token-dump
+injected-step22000	olmo	run/checkpoints/step22000-unsharded	run/scores_ladder/injected-step22000	-	42	--no-token-dump
+injected-step23000	olmo	run/checkpoints/step23000-unsharded	run/scores_ladder/injected-step23000	-	42	--no-token-dump
+seed42-step1000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step1000-unsharded	run/scores_ladder/seed42-step1000	-	42	--no-token-dump
+seed42-step2000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step2000-unsharded	run/scores_ladder/seed42-step2000	-	42	--no-token-dump
+seed42-step3000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step3000-unsharded	run/scores_ladder/seed42-step3000	-	42	--no-token-dump
+seed42-step4000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step4000-unsharded	run/scores_ladder/seed42-step4000	-	42	--no-token-dump
+seed42-step5000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step5000-unsharded	run/scores_ladder/seed42-step5000	-	42	--no-token-dump
+seed42-step6000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step6000-unsharded	run/scores_ladder/seed42-step6000	-	42	--no-token-dump
+seed42-step7000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step7000-unsharded	run/scores_ladder/seed42-step7000	-	42	--no-token-dump
+seed42-step8000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step8000-unsharded	run/scores_ladder/seed42-step8000	-	42	--no-token-dump
+seed42-step9000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step9000-unsharded	run/scores_ladder/seed42-step9000	-	42	--no-token-dump
+seed42-step10000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step10000-unsharded	run/scores_ladder/seed42-step10000	-	42	--no-token-dump
+seed42-step11000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step11000-unsharded	run/scores_ladder/seed42-step11000	-	42	--no-token-dump
+seed42-step12000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step12000-unsharded	run/scores_ladder/seed42-step12000	-	42	--no-token-dump
+seed42-step13000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step13000-unsharded	run/scores_ladder/seed42-step13000	-	42	--no-token-dump
+seed42-step14000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step14000-unsharded	run/scores_ladder/seed42-step14000	-	42	--no-token-dump
+seed42-step15000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step15000-unsharded	run/scores_ladder/seed42-step15000	-	42	--no-token-dump
+seed42-step16000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step16000-unsharded	run/scores_ladder/seed42-step16000	-	42	--no-token-dump
+seed42-step17000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step17000-unsharded	run/scores_ladder/seed42-step17000	-	42	--no-token-dump
+seed42-step18000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step18000-unsharded	run/scores_ladder/seed42-step18000	-	42	--no-token-dump
+seed42-step19000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step19000-unsharded	run/scores_ladder/seed42-step19000	-	42	--no-token-dump
+seed42-step20000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step20000-unsharded	run/scores_ladder/seed42-step20000	-	42	--no-token-dump
+seed42-step21000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step21000-unsharded	run/scores_ladder/seed42-step21000	-	42	--no-token-dump
+seed42-step22000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step22000-unsharded	run/scores_ladder/seed42-step22000	-	42	--no-token-dump
+seed42-step23000	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step23000-unsharded	run/scores_ladder/seed42-step23000	-	42	--no-token-dump
+sibling-step1000	olmo	assets/checkpoints/official_stage2_ingredient1/step1000-unsharded	run/scores_ladder/sibling-step1000	-	42069	--no-token-dump
+sibling-step2000	olmo	assets/checkpoints/official_stage2_ingredient1/step2000-unsharded	run/scores_ladder/sibling-step2000	-	42069	--no-token-dump
+sibling-step3000	olmo	assets/checkpoints/official_stage2_ingredient1/step3000-unsharded	run/scores_ladder/sibling-step3000	-	42069	--no-token-dump
+sibling-step4000	olmo	assets/checkpoints/official_stage2_ingredient1/step4000-unsharded	run/scores_ladder/sibling-step4000	-	42069	--no-token-dump
+sibling-step5000	olmo	assets/checkpoints/official_stage2_ingredient1/step5000-unsharded	run/scores_ladder/sibling-step5000	-	42069	--no-token-dump
+sibling-step6000	olmo	assets/checkpoints/official_stage2_ingredient1/step6000-unsharded	run/scores_ladder/sibling-step6000	-	42069	--no-token-dump
+sibling-step7000	olmo	assets/checkpoints/official_stage2_ingredient1/step7000-unsharded	run/scores_ladder/sibling-step7000	-	42069	--no-token-dump
+sibling-step8000	olmo	assets/checkpoints/official_stage2_ingredient1/step8000-unsharded	run/scores_ladder/sibling-step8000	-	42069	--no-token-dump
+sibling-step9000	olmo	assets/checkpoints/official_stage2_ingredient1/step9000-unsharded	run/scores_ladder/sibling-step9000	-	42069	--no-token-dump
+sibling-step10000	olmo	assets/checkpoints/official_stage2_ingredient1/step10000-unsharded	run/scores_ladder/sibling-step10000	-	42069	--no-token-dump
+sibling-step11000	olmo	assets/checkpoints/official_stage2_ingredient1/step11000-unsharded	run/scores_ladder/sibling-step11000	-	42069	--no-token-dump
+sibling-step12000	olmo	assets/checkpoints/official_stage2_ingredient1/step12000-unsharded	run/scores_ladder/sibling-step12000	-	42069	--no-token-dump
+sibling-step13000	olmo	assets/checkpoints/official_stage2_ingredient1/step13000-unsharded	run/scores_ladder/sibling-step13000	-	42069	--no-token-dump
+sibling-step14000	olmo	assets/checkpoints/official_stage2_ingredient1/step14000-unsharded	run/scores_ladder/sibling-step14000	-	42069	--no-token-dump
+sibling-step15000	olmo	assets/checkpoints/official_stage2_ingredient1/step15000-unsharded	run/scores_ladder/sibling-step15000	-	42069	--no-token-dump
+sibling-step16000	olmo	assets/checkpoints/official_stage2_ingredient1/step16000-unsharded	run/scores_ladder/sibling-step16000	-	42069	--no-token-dump
+sibling-step17000	olmo	assets/checkpoints/official_stage2_ingredient1/step17000-unsharded	run/scores_ladder/sibling-step17000	-	42069	--no-token-dump
+sibling-step18000	olmo	assets/checkpoints/official_stage2_ingredient1/step18000-unsharded	run/scores_ladder/sibling-step18000	-	42069	--no-token-dump
+sibling-step19000	olmo	assets/checkpoints/official_stage2_ingredient1/step19000-unsharded	run/scores_ladder/sibling-step19000	-	42069	--no-token-dump
+sibling-step20000	olmo	assets/checkpoints/official_stage2_ingredient1/step20000-unsharded	run/scores_ladder/sibling-step20000	-	42069	--no-token-dump
+sibling-step21000	olmo	assets/checkpoints/official_stage2_ingredient1/step21000-unsharded	run/scores_ladder/sibling-step21000	-	42069	--no-token-dump
+sibling-step22000	olmo	assets/checkpoints/official_stage2_ingredient1/step22000-unsharded	run/scores_ladder/sibling-step22000	-	42069	--no-token-dump
+sibling-step23000	olmo	assets/checkpoints/official_stage2_ingredient1/step23000-unsharded	run/scores_ladder/sibling-step23000	-	42069	--no-token-dump
+sft-injected	hf	posttrain/runs/sft_injected/olmo2_1b_sft_injected__1__0	run/scores_posttrain/sft-injected	-	-	-
+sft-baseline	hf	posttrain/runs/sft_baseline/olmo2_1b_sft_baseline__1__0	run/scores_posttrain/sft-baseline	-	-	-
+dpo-injected	hf	posttrain/runs/dpo_injected/olmo2_1b_dpo_injected__111__0	run/scores_posttrain/dpo-injected	-	-	-
+dpo-baseline	hf	posttrain/runs/dpo_baseline/olmo2_1b_dpo_baseline__111__0	run/scores_posttrain/dpo-baseline	-	-	-
+rlvr1-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__[0-9]*[0-9]	run/scores_posttrain/rlvr1-injected	-	-	-
+rlvr1-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__[0-9]*[0-9]	run/scores_posttrain/rlvr1-baseline	-	-	-
+rlvr2-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__[0-9]*[0-9]	run/scores_posttrain/rlvr2-injected	-	-	-
+rlvr2-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__[0-9]*[0-9]	run/scores_posttrain/rlvr2-baseline	-	-	-
+rlvr1-step200-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_200	run/scores_posttrain/rlvr1-step200-injected	-	-	-
+rlvr1-step400-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_400	run/scores_posttrain/rlvr1-step400-injected	-	-	-
+rlvr1-step600-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_600	run/scores_posttrain/rlvr1-step600-injected	-	-	-
+rlvr1-step800-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_800	run/scores_posttrain/rlvr1-step800-injected	-	-	-
+rlvr1-step1000-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_1000	run/scores_posttrain/rlvr1-step1000-injected	-	-	-
+rlvr1-step1200-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_1200	run/scores_posttrain/rlvr1-step1200-injected	-	-	-
+rlvr1-step1400-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_1400	run/scores_posttrain/rlvr1-step1400-injected	-	-	-
+rlvr1-step1600-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_1600	run/scores_posttrain/rlvr1-step1600-injected	-	-	-
+rlvr1-step1800-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_1800	run/scores_posttrain/rlvr1-step1800-injected	-	-	-
+rlvr1-step2000-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_2000	run/scores_posttrain/rlvr1-step2000-injected	-	-	-
+rlvr1-step2200-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_2200	run/scores_posttrain/rlvr1-step2200-injected	-	-	-
+rlvr1-step2400-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_2400	run/scores_posttrain/rlvr1-step2400-injected	-	-	-
+rlvr1-step2600-injected	hf	posttrain/runs/rlvr1_injected/olmo2_1b_rlvr1_injected__1__*_checkpoints/step_2600	run/scores_posttrain/rlvr1-step2600-injected	-	-	-
+rlvr1-step200-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_200	run/scores_posttrain/rlvr1-step200-baseline	-	-	-
+rlvr1-step400-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_400	run/scores_posttrain/rlvr1-step400-baseline	-	-	-
+rlvr1-step600-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_600	run/scores_posttrain/rlvr1-step600-baseline	-	-	-
+rlvr1-step800-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_800	run/scores_posttrain/rlvr1-step800-baseline	-	-	-
+rlvr1-step1000-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_1000	run/scores_posttrain/rlvr1-step1000-baseline	-	-	-
+rlvr1-step1200-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_1200	run/scores_posttrain/rlvr1-step1200-baseline	-	-	-
+rlvr1-step1400-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_1400	run/scores_posttrain/rlvr1-step1400-baseline	-	-	-
+rlvr1-step1600-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_1600	run/scores_posttrain/rlvr1-step1600-baseline	-	-	-
+rlvr1-step1800-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_1800	run/scores_posttrain/rlvr1-step1800-baseline	-	-	-
+rlvr1-step2000-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_2000	run/scores_posttrain/rlvr1-step2000-baseline	-	-	-
+rlvr1-step2200-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_2200	run/scores_posttrain/rlvr1-step2200-baseline	-	-	-
+rlvr1-step2400-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_2400	run/scores_posttrain/rlvr1-step2400-baseline	-	-	-
+rlvr1-step2600-baseline	hf	posttrain/runs/rlvr1_baseline/olmo2_1b_rlvr1_baseline__1__*_checkpoints/step_2600	run/scores_posttrain/rlvr1-step2600-baseline	-	-	-
+rlvr2-step200-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_200	run/scores_posttrain/rlvr2-step200-injected	-	-	-
+rlvr2-step400-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_400	run/scores_posttrain/rlvr2-step400-injected	-	-	-
+rlvr2-step600-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_600	run/scores_posttrain/rlvr2-step600-injected	-	-	-
+rlvr2-step800-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_800	run/scores_posttrain/rlvr2-step800-injected	-	-	-
+rlvr2-step1000-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_1000	run/scores_posttrain/rlvr2-step1000-injected	-	-	-
+rlvr2-step1200-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_1200	run/scores_posttrain/rlvr2-step1200-injected	-	-	-
+rlvr2-step1400-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_1400	run/scores_posttrain/rlvr2-step1400-injected	-	-	-
+rlvr2-step1600-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_1600	run/scores_posttrain/rlvr2-step1600-injected	-	-	-
+rlvr2-step1800-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_1800	run/scores_posttrain/rlvr2-step1800-injected	-	-	-
+rlvr2-step2000-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_2000	run/scores_posttrain/rlvr2-step2000-injected	-	-	-
+rlvr2-step2200-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_2200	run/scores_posttrain/rlvr2-step2200-injected	-	-	-
+rlvr2-step2400-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_2400	run/scores_posttrain/rlvr2-step2400-injected	-	-	-
+rlvr2-step2600-injected	hf	posttrain/runs/rlvr2_injected/olmo2_1b_rlvr2_injected__1__*_checkpoints/step_2600	run/scores_posttrain/rlvr2-step2600-injected	-	-	-
+rlvr2-step200-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_200	run/scores_posttrain/rlvr2-step200-baseline	-	-	-
+rlvr2-step400-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_400	run/scores_posttrain/rlvr2-step400-baseline	-	-	-
+rlvr2-step600-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_600	run/scores_posttrain/rlvr2-step600-baseline	-	-	-
+rlvr2-step800-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_800	run/scores_posttrain/rlvr2-step800-baseline	-	-	-
+rlvr2-step1000-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_1000	run/scores_posttrain/rlvr2-step1000-baseline	-	-	-
+rlvr2-step1200-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_1200	run/scores_posttrain/rlvr2-step1200-baseline	-	-	-
+rlvr2-step1400-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_1400	run/scores_posttrain/rlvr2-step1400-baseline	-	-	-
+rlvr2-step1600-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_1600	run/scores_posttrain/rlvr2-step1600-baseline	-	-	-
+rlvr2-step1800-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_1800	run/scores_posttrain/rlvr2-step1800-baseline	-	-	-
+rlvr2-step2000-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_2000	run/scores_posttrain/rlvr2-step2000-baseline	-	-	-
+rlvr2-step2200-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_2200	run/scores_posttrain/rlvr2-step2200-baseline	-	-	-
+rlvr2-step2400-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_2400	run/scores_posttrain/rlvr2-step2400-baseline	-	-	-
+rlvr2-step2600-baseline	hf	posttrain/runs/rlvr2_baseline/olmo2_1b_rlvr2_baseline__1__*_checkpoints/step_2600	run/scores_posttrain/rlvr2-step2600-baseline	-	-	-
+ai2-sft	hf	assets/hf_models/ai2_released/OLMo-2-0425-1B-SFT	run/scores_posttrain/ai2-sft	-	-	-
+ai2-dpo	hf	assets/hf_models/ai2_released/OLMo-2-0425-1B-DPO	run/scores_posttrain/ai2-dpo	-	-	-
+ai2-rlvr1	hf	assets/hf_models/ai2_released/OLMo-2-0425-1B-RLVR1	run/scores_posttrain/ai2-rlvr1	-	-	-
+ai2-instruct	hf	assets/hf_models/ai2_released/OLMo-2-0425-1B-Instruct	run/scores_posttrain/ai2-instruct	-	-	-
+F2x2-injected	olmo	run/checkpoints/step23852-unsharded	run/scores_cohortF_2x2/F2x2-injected	run/cohortF_2x2	42	-
+F2x2-seed42	olmo	assets/checkpoints/official_stage2_ingredient3_seed42/step23852-unsharded	run/scores_cohortF_2x2/F2x2-seed42	run/cohortF_2x2	42	-
+F2x2-stage1	olmo	assets/checkpoints/official_olmo_stage1_4001B	run/scores_cohortF_2x2/F2x2-stage1	run/cohortF_2x2	-	-

@@ -1,0 +1,67 @@
+# Installs only the small `olmo_twin` package (olmo_twin/paths.py, standard
+# library only), which every script uses to find the data root.
+#
+# Only editable installs are supported:
+#     pip install -e .                 # the olmo_twin package only
+#     pip install -e ".[analysis]"     # plus the pinned analysis environment
+# olmo_twin.paths derives the repository root (and with it the default data
+# root <repository>/data and the code directories that scripts import from)
+# from its own location. A regular `pip install .` copies the package into
+# site-packages, where these paths would be wrong. Running the scripts from a
+# checkout without installing anything also works: each script adds the
+# repository root to sys.path itself.
+#
+# The optional dependency groups mirror env/analysis/requirements.txt and
+# env/collection/requirements.txt; see env/README.md for the GPU images.
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "olmo-twin"
+version = "0.1.0"
+description = "Code of the OLMo-Twin study: a controlled membership-inference experiment on a re-run of OLMo 2 1B mid-training"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+# The olmo_twin package itself needs only Python >= 3.6; the analysis was run
+# with Python 3.13 (pins below need >= 3.12) and the RLVR analysis with 3.10.
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+# Pinned as measured (env/analysis/requirements.txt).
+analysis = [
+    "numpy==2.5.1",
+    "scipy==1.17.1",
+    "matplotlib==3.10.8",
+    "pandas==3.0.1",
+    "pyarrow==23.0.1",
+    "pypdfium2==5.6.0",
+    "pyyaml==6.0.3",
+    "pytest==9.0.2",
+    "zstandard==0.25.0",
+    "requests==2.32.5",
+]
+# Unpinned (env/collection/requirements.txt); GROBID runs as a separate service.
+collection = [
+    "numpy",
+    "numba",
+    "zstandard",
+    "requests",
+    "pandas",
+    "scipy",
+    "matplotlib",
+    "pyarrow",
+    "py7zr",
+    "beautifulsoup4",
+    "pyahocorasick",
+    "transformers",
+    "torch",
+    "sentence-transformers",
+    "huggingface_hub",
+    "wikiextractor==3.0.8",
+]
+
+[tool.setuptools]
+packages = ["olmo_twin"]

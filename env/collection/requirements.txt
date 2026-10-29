@@ -1,0 +1,44 @@
+# Collection environment: collection/ (document collection, the training-data
+# overlap search, the post-training and RLVR dataset scans, the cohort-F
+# re-parse) and design/.
+#
+# The exact package versions of the environment in which the documents were
+# originally collected were not recorded, so this list is unpinned except
+# where the code enforces a version. Requires Python 3.10 or later.
+#
+# External services, not installed by pip:
+#   GROBID 0.8.1 (PDF -> TEI for the PDF form of arXiv papers):
+#     docker run -d --rm --name grobid -p 8070:8070 --init lfoppiano/grobid:0.8.1
+#   (collection/cohortF_reparse.py records the image of the container named
+#   "grobid" in its report.)
+#
+# GPU (one device) is needed only for `collection/olmo2_nonmember_audit.py
+# embed` (sentence-transformers), scoring/score_pretreatment_logprobs.py and
+# `design/build_injection_manifest.py gen-samples`; torch can be the CPU build
+# otherwise.
+
+numpy
+# Fast shingle hashing in the corpus scan; collection/olmo2_midtrain_membership.py
+# falls back to pure NumPy if numba cannot be imported (numba must support the
+# installed numpy version).
+numba
+zstandard
+requests
+pandas
+scipy
+matplotlib
+pyarrow
+# StackExchange dump archives (renderer calibration only).
+py7zr
+# StackExchange HTML -> Dolma text renderer.
+beautifulsoup4
+# Optional: title matching in the older command-line interface of
+# collection/olmo2_midtrain_membership.py (not used by the paper's pipeline).
+pyahocorasick
+transformers
+torch
+sentence-transformers
+huggingface_hub
+# Enforced at import by collection/wikipedia_dolma_text.py: the measured
+# agreement with Dolma's Wikipedia text holds for this version only.
+wikiextractor==3.0.8

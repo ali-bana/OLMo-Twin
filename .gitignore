@@ -1,0 +1,27 @@
+# Default data root (olmo_twin/paths.py) and other local outputs.
+/data/
+/outputs/
+/paper/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+build/
+dist/
+
+# Data, scores, checkpoints and images: never committed (see docs/data.md).
+*.npz
+*.npy
+*.csv.gz
+*.jsonl.gz
+*.pt
+*.safetensors
+*.sif
+
+# Logs and experiment tracking
+wandb/
+slurm-*.out
+*.log

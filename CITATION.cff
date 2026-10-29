@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+message: "If you use this code or the data, please cite the paper given under preferred-citation."
+title: "OLMo-Twin"
+type: software
+abstract: >-
+  Code of a controlled membership-inference study on OLMo 2 1B. The official
+  50-billion-token mid-training stage is re-run with documents inserted from
+  7,814 matched pairs, one document of each pair chosen by a coin flip, and the
+  result is compared with AI2's released run from the same seed, which saw the
+  same training data everywhere else. Both models are carried through the
+  official post-training recipe.
+authors:
+  - given-names: Ali
+    family-names: Banaei
+    affiliation: KTH Royal Institute of Technology
+  - given-names: Muhammad Shahab
+    family-names: Shahzad
+    affiliation: KTH Royal Institute of Technology
+  - given-names: Gerald Q.
+    family-names: Maguire
+    name-suffix: Jr.
+    affiliation: KTH Royal Institute of Technology
+  - given-names: Marco
+    family-names: Chiesa
+    affiliation: KTH Royal Institute of Technology
+  - given-names: Dejan
+    family-names: Kostić
+    affiliation: KTH Royal Institute of Technology
+license: Apache-2.0
+repository-code: "https://github.com/ali-bana/OLMo-Twin"
+keywords:
+  - membership inference
+  - training-data provenance
+  - memorization
+  - language models
+  - privacy auditing
+  - OLMo
+preferred-citation:
+  type: article
+  title: "From Training Exposure to Membership Evidence: A Controlled Study of OLMo 2"
+  authors:
+    - given-names: Ali
+      family-names: Banaei
+      affiliation: KTH Royal Institute of Technology
+    - given-names: Muhammad Shahab
+      family-names: Shahzad
+      affiliation: KTH Royal Institute of Technology
+    - given-names: Gerald Q.
+      family-names: Maguire
+      name-suffix: Jr.
+      affiliation: KTH Royal Institute of Technology
+    - given-names: Marco
+      family-names: Chiesa
+      affiliation: KTH Royal Institute of Technology
+    - given-names: Dejan
+      family-names: Kostić
+      affiliation: KTH Royal Institute of Technology
+  year: 2026
+  status: preprint
+  notes: "arXiv preprint, to appear."

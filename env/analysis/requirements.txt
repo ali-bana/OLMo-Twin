@@ -1,0 +1,47 @@
+# Analysis environment (CPU): analysis/, analysis/rlvr/, figures/,
+# training/checks/ and the unit tests of collection/, design/ and
+# training/midtrain/.
+#
+# Versions as measured in the environment that produced the paper's analysis
+# outputs: Python 3.13.12. These pins need Python 3.12 or later (numpy 2.5.1
+# has no release for older versions).
+#
+# The figure PDFs are pixel-identical to the published ones only with the same
+# Matplotlib version and the same font resolution. The generators ask for the
+# first available of Nimbus Roman No9 L, Times New Roman and DejaVu Serif; the
+# published figures were drawn on a system with neither of the first two
+# installed, so Matplotlib used its bundled DejaVu Serif. With another version
+# or font the figures are equivalent but not pixel-identical. The numbers do
+# not depend on the fonts.
+#
+# The RLVR analysis (analysis/rlvr/) was run with the Python of the
+# post-training image instead (Python 3.10, numpy 1.26.4, pandas 2.2.3; see
+# env/posttrain/pip-freeze.txt).
+
+numpy==2.5.1
+scipy==1.17.1
+matplotlib==3.10.8
+pandas==3.0.1
+pyarrow==23.0.1
+# Only for figures/compare_with_paper.py (renders PDFs for the comparison).
+pypdfium2==5.6.0
+
+# Checks and tests.
+# training/checks/compare_configs.py, training/midtrain/tests/test_prepare_stage2_assets.py
+pyyaml==6.0.3
+pytest==9.0.2
+# Imported by the collection library that the collection tests load.
+zstandard==0.25.0
+requests==2.32.5
+# numba: the measured environment has numba 0.61.2 installed, but that release
+# requires numpy<2.3 and does not import with numpy 2.5, so it cannot be pinned
+# here (pip refuses the combination). collection/olmo2_midtrain_membership.py
+# then uses its pure-NumPy fallback, which the collection tests compare with the
+# numba path. Install numba in the collection environment
+# (env/collection/requirements.txt), where it is used for the corpus scan.
+
+# Optional, not installed by default:
+# torch (CPU build) - only for training/checks/compare_hf_branches.py
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+# wandb - only for training/checks/check_lr_schedule.py (reads the run's
+#   offline Weights & Biases log)

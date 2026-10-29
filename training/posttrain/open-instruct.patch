@@ -1,0 +1,61 @@
+diff --git a/open_instruct/dpo_tune_cache.py b/open_instruct/dpo_tune_cache.py
+index 89bec16b1..b92bb60ae 100644
+--- a/open_instruct/dpo_tune_cache.py
++++ b/open_instruct/dpo_tune_cache.py
+@@ -483,7 +483,11 @@ def main(args: FlatArguments, tc: TokenizerConfig):
+ 
+     # ------------------------------------------------------------
+     # Set up runtime variables
+-    args.run_name = f"{args.exp_name}__{args.seed}__{int(time.time())}"
++    # OLMo-Twin patch: time.time() is evaluated independently on every rank,
++    # so a 1s skew scatters DeepSpeed shards across different checkpoint
++    # directories (observed: 8 ranks -> 3 dirs), and every resubmission gets
++    # a fresh dir, breaking auto-resume. Pin via OI_RUN_TIMESTAMP.
++    args.run_name = f"{args.exp_name}__{args.seed}__{int(os.environ.get('OI_RUN_TIMESTAMP') or time.time())}"
+     args.output_dir = os.path.join(args.output_dir, args.run_name)
+     args.dataset_local_cache_dir = os.path.abspath(args.dataset_local_cache_dir)
+     if is_beaker_job():
+@@ -1032,9 +1036,10 @@ def main(args: FlatArguments, tc: TokenizerConfig):
+             args.use_lora,
+         )
+ 
+-    # remove all checkpoints to save space
++    # OLMo-Twin patch: honor keep_last_n_checkpoints (-1 = keep all), as in
++    # finetune.py -- the membership-decay analysis needs the checkpoint ladder.
+     if accelerator.is_local_main_process:
+-        clean_last_n_checkpoints(args.output_dir, keep_last_n_checkpoints=0)
++        clean_last_n_checkpoints(args.output_dir, keep_last_n_checkpoints=args.keep_last_n_checkpoints)
+ 
+     if (
+         args.try_auto_save_to_beaker
+diff --git a/open_instruct/finetune.py b/open_instruct/finetune.py
+index 5cfd80ebe..1af0abeba 100644
+--- a/open_instruct/finetune.py
++++ b/open_instruct/finetune.py
+@@ -403,7 +403,11 @@ def main(args: FlatArguments, tc: TokenizerConfig):
+ 
+     # ------------------------------------------------------------
+     # Set up runtime variables
+-    args.run_name = f"{args.exp_name}__{args.seed}__{int(time.time())}"
++    # OLMo-Twin patch: time.time() is evaluated independently on every rank,
++    # so a 1s skew scatters DeepSpeed shards across different checkpoint
++    # directories (observed: 8 ranks -> 3 dirs), and every resubmission gets
++    # a fresh dir, breaking auto-resume. Pin via OI_RUN_TIMESTAMP.
++    args.run_name = f"{args.exp_name}__{args.seed}__{int(os.environ.get('OI_RUN_TIMESTAMP') or time.time())}"
+     args.output_dir = os.path.join(args.output_dir, args.run_name)
+     args.dataset_local_cache_dir = os.path.abspath(args.dataset_local_cache_dir)
+     if is_beaker_job():
+@@ -887,9 +891,11 @@ def main(args: FlatArguments, tc: TokenizerConfig):
+             args.use_lora,
+         )
+ 
+-    # remove all checkpoints to save space
++    # OLMo-Twin patch: honor keep_last_n_checkpoints (-1 = keep all) instead of
++    # unconditionally deleting every intermediate checkpoint after training --
++    # the membership-decay analysis needs the full checkpoint ladder.
+     if accelerator.is_local_main_process:
+-        clean_last_n_checkpoints(args.output_dir, keep_last_n_checkpoints=0)
++        clean_last_n_checkpoints(args.output_dir, keep_last_n_checkpoints=args.keep_last_n_checkpoints)
+ 
+     if (
+         args.try_auto_save_to_beaker
