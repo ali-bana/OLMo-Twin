@@ -1038,7 +1038,9 @@ def fig_cohort(cols, pairs, M):
     ax.axvline(0, color="#222", lw=0.6)
     ax.set_yticks(y)
     lab = {"E": " (re-exposure)", "F": " (failed placebo)", "X": " (synthetic)", "": ""}
-    ax.set_yticklabels([f"{t['ch']}{lab[t['flag']]}  $n$={t['n']}" for t in single], fontsize=6.2)
+    # cohort names as the paper writes them (W\textsubscript{new}, ...)
+    name = {"W-new": r"W$_\mathregular{new}$", "W-gap": r"W$_\mathregular{gap}$", "S-se": r"S$_\mathregular{se}$"}
+    ax.set_yticklabels([f"{name.get(t['ch'], t['ch'])}{lab[t['flag']]}  $n$={t['n']}" for t in single], fontsize=6.2)
     ax.set_ylim(-0.6, len(single) - 0.4)
     ax.set_xlabel("within-pair effect (nats/token), 95% CI", fontsize=7)
     ax.tick_params(axis="x", labelsize=6.4)
